@@ -4,12 +4,12 @@ using namespace std;
 
 #define MAX (int)10e6
 
-int tree[MAX * 4], lazy[MAX * 4], values[MAX];
+int tree[MAX << 2], lazy[MAX << 2], values[MAX];
 
 void lazyprop(int id){
     if(lazy[id] != 0){
-        lazy[id*2] = lazy[id];
-        lazy[id*2+1] = lazy[id];
+        lazy[(id<<1)] = lazy[id];
+        lazy[(id<<1)+1] = lazy[id];
         lazy[id] = 0;
     }
 }
@@ -22,11 +22,11 @@ int read(int id, int l, int r, int x, int y){
         if(l >= x && r <= y){
             return tree[id];
         }else{
-            int mid = (l+r)/2;
+            int mid = (l+r)>>1;
             lazyprop(id);
-            int q1 = read(id*2, l, mid, x, y);
-            int q2 = read(id*2+1, mid+1, r, x, y);
-            tree[id] = tree[id*2] + tree[id*2+1];
+            int q1 = read((id<<1), l, mid, x, y);
+            int q2 = read((id<<1)+1, mid+1, r, x, y);
+            tree[id] = tree[(id<<1)] + tree[(id<<1)+1];
             return q1 + q2;
         }
     }
@@ -40,21 +40,21 @@ void update(int id, int l, int r, int x, int y, int value){
         lazy[id] = value;
         tree[id] = value * ((r-l) + 1);
     }else{
-        int mid = (l+r)/2;
+        int mid = (l+r)>>1;
         lazyprop(id);
-        update(id*2, l, mid, x, y, value);
-        update(id*2+1, mid+1, r, x, y, value);
-        tree[id] = tree[id*2] + tree[id*2+1];
+        update((id<<1), l, mid, x, y, value);
+        update((id<<1)+1, mid+1, r, x, y, value);
+        tree[id] = tree[(id<<1)] + tree[(id<<1)+1];
     }
 }
 
 void build(int id, int l, int r){
     if(l == r) tree[id] = values[l];
     else{
-        int mid = (l+r)/2;
-        build(id*2, l, mid);
-        build(id*2+1, mid+1, r);
-        tree[id] = tree[id*2] + tree[id*2+1];
+        int mid = (l+r)>>1;
+        build((id<<1), l, mid);
+        build((id<<1)+1, mid+1, r);
+        tree[id] = tree[(id<<1)] + tree[(id<<1)+1];
     }
 }
 
